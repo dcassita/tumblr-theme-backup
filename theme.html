@@ -242,50 +242,14 @@ iframe.embed_iframe {height: 100%;width: 100%;margin: auto;}
 .link a:hover {color: #fff !important;border-bottom:1px solid;}
 .link-excerpt {padding: 20px 40px;background: #f5f5f5;color: #aaa;}
 
-/* P5 EMBED DEFINITIVO */
-.p5-embed-wrap {
-    display: none;
-    width: 100% !important;
-    height: 100% !important;
-    position: relative;
-}
-
-.p5-embed {
-    border: 0;
-    display: block;
-    width: 100% !important;
-    height: 100% !important;
-    min-height: inherit;
-}
-
-/* Quando o P5 está ativo */
-.post.p5-embed-active {
-    background-color: transparent !important;
-}
-
-.post.p5-embed-active .p5-embed-wrap {
-    display: block !important;
-}
-
-/* ESPECÍFICO PARA A PÁGINA DO POST */
-{block:PermalinkPage}
-.post.p5-embed-active { 
-    height: {text:P5 Embed Height} !important; 
-    min-height: {text:P5 Embed Height} !important;
-    max-height: none !important;
-}
-
-/* Força todos os possíveis contêineres do Tumblr a esticarem */
-.post.p5-embed-active .text-post,
-.post.p5-embed-active .link-post,
-.post.p5-embed-active .link-excerpt,
-.post.p5-embed-active div[class*="npf"] {
-    height: 100% !important;
-    min-height: {text:P5 Embed Height} !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-{/block:PermalinkPage}
+.p5-embed-wrap {display: none;width: 100%;height: 100%;}
+.p5-embed {border: 0;display: block;height: 100%;width: 100%;}
+.post.p5-embed-active .p5-embed-wrap {display: block;}
+.post.p5-embed-active .link,
+.post.p5-embed-active .npf-link-block {display: none;}
+.post.p5-embed-active.link-post {background-color: transparent;}
+.post.p5-embed-active .text-post {height: 100%;padding: 0;}
+{block:PermalinkPage}.post.p5-embed-active {height: {text:P5 Embed Height};}{/block:PermalinkPage}
 
 /* audio post */
 
@@ -393,6 +357,33 @@ li.reply:before{content:'\ebce';font-family:'honeybee';margin-top: -3px;position
 #main {width: 80%;} 
 #posts {{block:IndexPage}display: grid;grid-template-columns: repeat(1, 1fr);{/block:IndexPage}}
 }
+
+{block:PermalinkPage}
+/* Estica o post e o contêiner principal */
+.post.p5-embed-active, #posts { 
+    height: {text:P5 Embed Height} !important; 
+    min-height: {text:P5 Embed Height} !important;
+    display: block !important;
+    width: 100% !important;
+}
+/* Força o iframe a ignorar bordas e preencher tudo */
+.p5-embed-wrap, .p5-embed {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: none !important;
+    background: transparent;
+}
+/* Esconde o lixo visual do link padrão */
+.post.p5-embed-active .link-post, 
+.post.p5-embed-active .npf-link-block,
+.post.p5-embed-active .link {
+    display: none !important;
+}
+{/block:PermalinkPage}
 
 </style>
 </head>

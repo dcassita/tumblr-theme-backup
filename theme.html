@@ -685,66 +685,55 @@ li.reply:before{content:'\ebce';font-family:'honeybee';margin-top: -3px;position
 
 <script>
 $(document).ready(function(){
-$('.photo-slideshow').pxuPhotoset({
-lightbox: true,
-rounded: false,
-gutter: '4px',
-photoset: '.photo-slideshow',
-photoWrap: '.photo-data',
-photo: '.pxu-photo'
-});
-$('body').tooltip({ track: true });
-var $container = $('#posts');
-{block:IndexPage}
-$container.infiniteScroll({
-path: '.next',
-append: '.post',
-hideNav: '.pagination',
-status: '.page-load-status',
-scrollThreshold: 50,
-history: false
-});
-$('.page-load-status').hide();
-{/block:IndexPage}
+    // Mantém o básico
+    $('.photo-slideshow').pxuPhotoset({lightbox:true, gutter:'4px'});
 
-{block:PermalinkPage}
-var p5Tag = "{text:P5 Embed Tag}";
-if (p5Tag) {
-  $('.post.' + p5Tag).each(function(){
-    var $post = $(this);
-    var $embed = $post.find('.p5-embed');
-    var src = $embed.data('src');
-    if (!src) {
-      src = $post.find('.npf-link-block a[href]').first().attr('href');
-      if (src) {
-        if ($embed.length === 0) {
-          var $wrap = $('<div class="p5-embed-wrap"><iframe class="p5-embed" loading="lazy" allowfullscreen></iframe></div>');
-          $embed = $wrap.find('.p5-embed');
-          var $insertTarget = $post.find('.npf-link-block').first();
-          if ($insertTarget.length) {
-            $wrap.insertBefore($insertTarget);
-          } else {
-            $post.find('.text-post').first().prepend($wrap);
-          }
-        }
-        $embed.attr('src', src);
-      }
-    } else {
-      $embed.attr('src', src);
+    function converterP5() {
+        // 1. Procura a tag configurada (ex: p5)
+        var minhaTag = "{text:P5 Embed Tag}" || "p5";
+        
+        // 2. Tenta achar QUALQUER post que tenha essa classe de tag
+        $('.post').each(function(){
+            var $estePost = $(this);
+            
+            // Verifica se o post tem a tag ou se o texto dentro dele tem o link do p5js
+            if ($estePost.hasClass(minhaTag) || $estePost.html().indexOf('p5js.org') > -1) {
+                
+                // Evita carregar duas vezes
+                if ($estePost.data('p5-ready')) return;
+
+                // Procura o link dentro do post
+                var linkP5 = $estePost.find('a[href*="p5js.org"]').attr('href');
+
+                if (linkP5) {
+                    console.log("Achei um link p5:", linkP5);
+                    var urlLimpa = linkP5.replace('/sketches/', '/full/').replace('/present/', '/full/');
+
+                    // Cria o visual por cima de tudo
+                    var estrutura = $('<div style="width:100%; height:680px; background:#fff; overflow:hidden; position:relative; z-index:9999;"><iframe src="'+urlLimpa+'" style="width:100%; height:100%; border:none;"></iframe></div>');
+                    
+                    // Coloca no topo do post
+                    $estePost.prepend(estrutura);
+                    $estePost.data('p5-ready', true);
+                    $estePost.addClass('p5-embed-active');
+
+                    // Esconde o conteúdo original que está sobrando (o link teimoso)
+                    $estePost.find('.link-post, .link, .npf-link-block, .text-post, .link-excerpt').css('display', 'none');
+                }
+            }
+        });
     }
-    if ($embed.length && $embed.attr('src')) {
-      $post.addClass('p5-embed-active');
-    }
-  });
-}
-{/block:PermalinkPage}
 
-$(".back-to-top").click(function(){$('html, body').animate({scrollTop: '0px'}, 2000, 'linear');});
+    // Tenta rodar logo de cara, depois de 1s e depois de 3s (pra garantir)
+    converterP5();
+    setTimeout(converterP5, 1000);
+    setTimeout(converterP5, 3000);
 
+    // Se o usuário rolar a tela (Infinite Scroll), tenta de novo
+    $(window).scroll(function() { converterP5(); });
 });
 </script>
 
 </body>
  
 </html>
-
